@@ -37,20 +37,20 @@ const sellerSchema = new mongoose.Schema({
     },
     products: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'Product'
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'Product',
         }
     ]
 }, {
     timestamps: true
 });
 
-sellerSchema.pre('save', async (next) => {
+sellerSchema.pre('save', async function (next) {
     if(!this.isModified('password')){
         return next;
     }
 
-    this.password = await bcryptjs.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 

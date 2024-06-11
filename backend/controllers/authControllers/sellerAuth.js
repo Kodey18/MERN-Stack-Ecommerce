@@ -9,7 +9,7 @@ route : '/api/v1/seller/register'
 const registerSeller = async_handler( async(req, res, next) => {
     const {name, email, password, phone, address, alterante, city, state} = req.body;
 
-    if(!name || !email || !password || !phone || !address || !alterante || !city || !state){
+    if(!name || !email || !password || !phone || !address || !city || !state){
         return res.status(301).json({
             success : false,
             message: "All credentials are required."
