@@ -7,6 +7,18 @@ method : GET
 route : '/api/v1/products/'
 */
 const getProducts = async_handler(async (req, res) => {
+    try{
+        const allProducts = await Product.find();
+
+        if(allProducts){
+            return res.status(201).json({
+                success : true,
+                allProducts
+            });
+        }
+    }catch(err){
+        console.log("error getting all products : ",err);
+    }
 });
 
 /* 
