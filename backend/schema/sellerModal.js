@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const sellerSchema = new mongoose.Schema({
     name: {
@@ -43,6 +44,20 @@ const sellerSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+sellerSchema.pre('save', async (next) => {
+    if(!this.isModified('password')){
+        return next;
+    }
+
+    this.password = await bcryptjs.hash(this.password, 10);
+    next();
+});
+
+// compare
+sellerSchema.methods.comparePassword = async (enteredPassword) => {
+    return await bcrypt.compare(enteredPassword, this.password);
+}
 
 const Seller = mongoose.model('Seller', sellerSchema);
 
