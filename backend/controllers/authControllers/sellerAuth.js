@@ -73,12 +73,33 @@ const loginSeller = async_handler( async(req, res, next) => {
             success : true,
             seller,
         });
+
     }catch(err){
         console.log(`Error loging-in the seller : ${err}`);
+    }
+});
+
+/* 
+Desc : Log-out the seler.
+Method : post
+route : '/api/v1/seller/logout'
+*/
+
+const logoutSeller = async_handler( async(req, res) => {
+    try{
+        res.clearCookie("jwt");
+        return res.status(200).json({
+            message: "Logged out!"
+        });
+    } catch(err){
+        const error = new Error("error while logging out", err);
+        error.statusCode = 401;
+        throw error;
     }
 })
 
 module.exports = {
     registerSeller,
     loginSeller,
+    logoutSeller
 }
