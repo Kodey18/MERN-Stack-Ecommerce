@@ -3,7 +3,7 @@ const { cookie } = require('express');
 
 require('dotenv').config();
 
-const generateToekn = (res, objId) => {
+const generateToken = (res, objId) => {
     const token = jwt.sign({objId}, process.env.JWT_SEC, {
         expiresIn : '1d',
     });
@@ -17,4 +17,4 @@ const generateToekn = (res, objId) => {
     });
 }
 
-module.exports = generateToekn;
+module.exports = generateToken;

@@ -55,9 +55,9 @@ sellerSchema.pre('save', async function (next) {
 });
 
 // compare
-sellerSchema.methods.comparePassword = async (enteredPassword) => {
-    return await bcrypt.compare(enteredPassword, this.password);
-}
+// sellerSchema.methods.comparePassword = async (enteredPassword) => {
+//     return await bcrypt.compareSync(enteredPassword, this.password);
+// }
 
 const Seller = mongoose.model('Seller', sellerSchema);
 

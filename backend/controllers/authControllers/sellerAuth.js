@@ -1,5 +1,7 @@
 const async_handler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
 const Seller = require("../../schema/sellerModal");
+const generateToken = require("../../utils/generateToken");
 
 /* 
 Desc : Register a seller.
@@ -39,6 +41,44 @@ const registerSeller = async_handler( async(req, res, next) => {
     }
 });
 
+/* 
+Desc : Log-in the seler.
+Method : post
+route : '/api/v1/seller/login'
+*/
+const loginSeller = async_handler( async(req, res, next) => {
+    const {email, password} = req.body;
+
+    if(!email || !password){
+        return res.status(406).json({
+            success: false,
+            message : "All credentials are rerquired for login.",
+        });
+    }
+
+    try{
+        const seller = await Seller.findOne({email}).exec();
+        const authenticated = await bcrypt.compareSync(password, seller.password);
+
+        if(!seller || !(authenticated)){
+            return res.status(401).json({
+                success : false,
+                message : "Either email or password is incorrect."
+            });
+        }
+
+        generateToken(res, seller._id);
+
+        return res.status(201).json({
+            success : true,
+            seller,
+        });
+    }catch(err){
+        console.log(`Error loging-in the seller : ${err}`);
+    }
+})
+
 module.exports = {
     registerSeller,
+    loginSeller,
 }
