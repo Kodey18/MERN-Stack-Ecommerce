@@ -1,6 +1,7 @@
 const async_handler = require("express-async-handler");
 const Product = require("../schema/productModal");
 const ErrorResponse = require("../utils/errorResponse");
+const ApiFeatures = require("../utils/apiFeatures");
 
 /* 
 Desc : get all products
@@ -8,8 +9,11 @@ method : GET
 route : '/api/v1/products/'
 */
 const getProducts = async_handler(async (req, res, next) => {
+    const apiFeatures = new ApiFeatures(Product.find(), req.query)
+    .search()
+    .filter();
     try{
-        const allProducts = await Product.find();
+        const allProducts = await apiFeatures.query;
 
         if(allProducts){
             return res.status(201).json({
@@ -113,7 +117,7 @@ method : DELETE
 route : '/api/v1/products/DELETE/:productId'
 */
 
-const deleteProduct = async_handler( async(req, res) => {
+const deleteProduct = async_handler( async(req, res, next) => {
     const productId = req.params.productID;
 
     try{
@@ -137,7 +141,7 @@ const deleteProduct = async_handler( async(req, res) => {
         }
 
         // Delete the product
-        await product.remove();
+        await Product.findByIdAndDelete(productId);
 
         // Return success response
         return res.status(200).json({
