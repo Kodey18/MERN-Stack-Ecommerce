@@ -83,7 +83,7 @@ const logoutSeller = async_handler( async(req, res, next) => {
     } catch(err){
         next(new ErrorResponse(`error while logging out : ${err}`, 401));
     }
-})
+});
 
 module.exports = {
     registerSeller,
