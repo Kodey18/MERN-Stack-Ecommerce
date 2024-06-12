@@ -49,7 +49,61 @@ const createProduct = async_handler( async(req, res, next) => {
     }
 });
 
+/* 
+Desc : update a product
+method : PUT
+route : '/api/v1/products/update/:productId'
+*/
+const updateProduct = async_handler( async(req, res) => {
+    const productId = req.params.productID;
+    const {name, description, price, stock, images, category} = req.body;
+
+    try{
+        const product = await Product.findById(productId);
+
+        if(!product){
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        // Check if the authenticated user is the seller of the product
+        if (product.seller.toString() !== req.user.objId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized to update this product'
+            });
+        }
+
+        // Update product fields
+        product.name = name || product.name;
+        product.description = description || product.description;
+        product.price = price || product.price;
+        product.images = images || product.images;
+        product.category = category || product.category;
+        product.stock = stock || product.stock;
+
+        await product.save();
+
+        // Return success response
+        return res.status(200).json({
+            success: true,
+            message: 'Product updated successfully',
+            product
+        });
+
+    }catch(err){
+        console.error('Error updating product:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+})
+
 module.exports = {
     getProducts,
     createProduct,
+    updateProduct,
 }
