@@ -67,7 +67,7 @@ const loginSeller = async_handler( async(req, res, next) => {
             });
         }
 
-        generateToken(res, seller._id);
+        generateToken(res, seller._id, seller.role);
 
         return res.status(201).json({
             success : true,

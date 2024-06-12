@@ -26,9 +26,17 @@ Desc : create a product
 method : POST
 route : '/api/v1/products/create'
 */
-const createProduct = async_handler( async(req, res) => {
+const createProduct = async_handler( async(req, res, next) => {
+    const {name, description, price, images, category} = req.body
     try{
-        const product = await Product.create(req.body);
+        const product = await Product.create({
+            name,
+            description,
+            price,
+            images,
+            category,
+            seller: req.user.objId,
+        });
 
         if(product){
             return res.status(201).json({

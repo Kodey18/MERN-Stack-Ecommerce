@@ -3,8 +3,8 @@ const { cookie } = require('express');
 
 require('dotenv').config();
 
-const generateToken = (res, objId) => {
-    const token = jwt.sign({objId}, process.env.JWT_SEC, {
+const generateToken = (res, objId, role) => {
+    const token = jwt.sign({objId, role}, process.env.JWT_SEC, {
         expiresIn : '1d',
     });
 

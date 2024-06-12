@@ -40,7 +40,12 @@ const sellerSchema = new mongoose.Schema({
             type : mongoose.Schema.Types.ObjectId,
             ref : 'Product',
         }
-    ]
+    ],
+    role : {
+        type: String,
+        default: "seller",
+        required: false,
+    }
 }, {
     timestamps: true
 });
@@ -53,11 +58,6 @@ sellerSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
-
-// compare
-// sellerSchema.methods.comparePassword = async (enteredPassword) => {
-//     return await bcrypt.compareSync(enteredPassword, this.password);
-// }
 
 const Seller = mongoose.model('Seller', sellerSchema);
 
