@@ -11,7 +11,8 @@ route : '/api/v1/products/'
 const getProducts = async_handler(async (req, res, next) => {
     const apiFeatures = new ApiFeatures(Product.find(), req.query)
     .search()
-    .filter();
+    .filter()
+    .paginate();
     try{
         const allProducts = await apiFeatures.query;
 

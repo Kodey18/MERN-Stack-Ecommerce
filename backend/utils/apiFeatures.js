@@ -29,13 +29,21 @@ class ApiFeatures{
         // Remove fields from query
         const removeFields = ['keyword', 'page', 'limit'];
         removeFields.forEach(param => delete queryCopy[param]);
-        console.log(queryCopy); 
 
         // Advanced filtering for price, rating, etc.
         let queryStr = JSON.stringify(queryCopy);
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
         this.query = this.query.find(JSON.parse(queryStr));
+        return this;
+    }
+
+    // Pagination functionality
+    paginate(resultsPerPage) {
+        const currentPage = Number(this.queryStr.page) || 1;
+        const skip = resultsPerPage * (currentPage - 1);
+
+        this.query = this.query.limit(resultsPerPage).skip(skip);
         return this;
     }
 }
