@@ -1,5 +1,5 @@
 const async_handler = require("express-async-handler");
-const Product = require("../schema/productModal");
+const Product = require("../schema/productModel");
 const ErrorResponse = require("../utils/errorResponse");
 const ApiFeatures = require("../utils/apiFeatures");
 

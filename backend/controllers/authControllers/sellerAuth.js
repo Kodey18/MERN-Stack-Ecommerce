@@ -1,6 +1,6 @@
 const async_handler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
-const Seller = require("../../schema/sellerModal");
+const Seller = require("../../schema/sellerModel");
 const generateToken = require("../../utils/generateToken");
 const ErrorResponse = require("../../utils/errorResponse");
 
