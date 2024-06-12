@@ -2,6 +2,7 @@ const async_handler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const Seller = require("../../schema/sellerModal");
 const generateToken = require("../../utils/generateToken");
+const ErrorResponse = require("../../utils/errorResponse");
 
 /* 
 Desc : Register a seller.
@@ -12,20 +13,14 @@ const registerSeller = async_handler( async(req, res, next) => {
     const {name, email, password, phone, address, alterante, city, state} = req.body;
 
     if(!name || !email || !password || !phone || !address || !city || !state){
-        return res.status(301).json({
-            success : false,
-            message: "All credentials are required."
-        });
+        return next(new ErrorResponse("All credentials are required.", 301));
     }
 
     try{
         const emailExists = await Seller.findOne({email : email});
 
         if(emailExists){
-            return res.status(406).json({
-                success : false,
-                message : "Seller with this email already exist."
-            });
+            return next(new ErrorResponse("Seller with this email already exist.", 301));
         }
 
         const seller = await Seller.create(req.body);
@@ -37,7 +32,7 @@ const registerSeller = async_handler( async(req, res, next) => {
             });
         }
     } catch(err){
-        console.log(`Error creating a seller : ${err}`);
+        next(err);
     }
 });
 
@@ -50,10 +45,7 @@ const loginSeller = async_handler( async(req, res, next) => {
     const {email, password} = req.body;
 
     if(!email || !password){
-        return res.status(406).json({
-            success: false,
-            message : "All credentials are rerquired for login.",
-        });
+        return next(new ErrorResponse("All credentials are rerquired for login.", 406));
     }
 
     try{
@@ -61,10 +53,7 @@ const loginSeller = async_handler( async(req, res, next) => {
         const authenticated = await bcrypt.compareSync(password, seller.password);
 
         if(!seller || !(authenticated)){
-            return res.status(401).json({
-                success : false,
-                message : "Either email or password is incorrect."
-            });
+            return next(new ErrorResponse("Either email or password is incorrect.", 403));
         }
 
         generateToken(res, seller._id, seller.role);
@@ -75,7 +64,7 @@ const loginSeller = async_handler( async(req, res, next) => {
         });
 
     }catch(err){
-        console.log(`Error loging-in the seller : ${err}`);
+        next(err);
     }
 });
 
@@ -85,16 +74,14 @@ Method : post
 route : '/api/v1/seller/logout'
 */
 
-const logoutSeller = async_handler( async(req, res) => {
+const logoutSeller = async_handler( async(req, res, next) => {
     try{
         res.clearCookie("jwt");
         return res.status(200).json({
             message: "Logged out!"
         });
     } catch(err){
-        const error = new Error("error while logging out", err);
-        error.statusCode = 401;
-        throw error;
+        next(new ErrorResponse(`error while logging out : ${err}`, 401));
     }
 })
 
