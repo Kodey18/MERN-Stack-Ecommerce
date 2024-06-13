@@ -2,13 +2,14 @@ const async_handler = require("express-async-handler");
 const Product = require("../schema/productModel");
 const ErrorResponse = require("../utils/errorResponse");
 const ApiFeatures = require("../utils/apiFeatures");
+const { response } = require("express");
 
 /* 
 Desc : get all products
 method : GET
 route : '/api/v1/products/'
 */
-const getProducts = async_handler(async (req, res, next) => {
+const getAllProducts = async_handler(async (req, res, next) => {
     const apiFeatures = new ApiFeatures(Product.find(), req.query)
     .search()
     .filter()
@@ -25,6 +26,27 @@ const getProducts = async_handler(async (req, res, next) => {
     }catch(err){
         next(err);
     }
+});
+
+/* 
+Desc : get single product
+method : GET
+route : '/api/v1/products/:productID'
+*/
+const getSingleProduct = async_handler( async(req, res, next) => {
+    const productID = req.params.productID;
+    try{
+        const product = await Product.findById(productID);
+
+        if(!product){
+            return next(new ErrorResponse("Product not found",401));
+        }
+
+        return res.status(200).json({
+            success: true,
+            product,
+        });
+    }catch(err){}
 });
 
 /* 
@@ -160,8 +182,9 @@ const deleteProduct = async_handler( async(req, res, next) => {
 })
 
 module.exports = {
-    getProducts,
+    getAllProducts,
     createProduct,
     updateProduct,
     deleteProduct,
+    getSingleProduct,
 }
