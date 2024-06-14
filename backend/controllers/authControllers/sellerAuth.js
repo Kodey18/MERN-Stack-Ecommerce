@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const Seller = require("../../schema/sellerModel");
 const generateToken = require("../../utils/generateToken");
 const ErrorResponse = require("../../utils/errorResponse");
+const { forgetPassword } = require("./userAuth");
+const sendEmail = require("../../utils/sendEmail");
 
 /* 
 Desc : Register a seller.
@@ -73,7 +75,6 @@ Desc : Log-out the seler.
 Method : post
 route : '/api/v1/seller/logout'
 */
-
 const logoutSeller = async_handler( async(req, res, next) => {
     try{
         res.clearCookie("jwt");
@@ -85,8 +86,96 @@ const logoutSeller = async_handler( async(req, res, next) => {
     }
 });
 
+const forgotPassword = async_handler( async(req, res, next) => {
+    const {email} = req.body;
+
+    if(!email){
+        return next(new ErrorResponse("Please provide an email", 401));
+    }
+
+    try{
+        const seller = await Seller.findOne({email: email});
+
+        if(!seller){
+            return next(new ErrorResponse("seller not found", 404));
+        }
+
+        // get resetPasswordToken
+        const resetToken = user.getResetPasswordToken();
+
+        await seller.save({validateBeforeSave: false});
+
+        const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/Auth/seller/password/reset/${resetToken}`;
+
+        const message = `Your password reset Token is : \n\n ${resetPasswordUrl} \n\nif you have not requested this mail for changing password then, please ignore it.`;
+
+        try{
+            await sendEmail({
+                email: seller.email,
+                subject: `Ecommerce Password recovery`,
+                message
+            });
+
+            return res.status(200).json({
+                success: true.valueOf,
+                message: `Email sent to ${seller.email} successfully.`
+            });
+        }catch(err){
+            seller.resetPasswordToken = undefined;
+            seller.resetPasswordExpire = undefined;
+
+            await seller.save({validateBeforeSave: false});
+
+            return next(err.message, 500);
+        }
+    }catch(error){
+        next(err);
+    }
+});
+
+
+const resetPassword = async_handler( async(req, res, next) => {
+    const resetToken = req.params.token;
+    console.log(resetToken);
+
+    const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+
+    try{
+        const seller = await Seller.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() },
+        });
+    
+        if(!seller){
+            return next(new ErrorResponse("Reset password token is invalid or has been expired", 400));
+        }
+    
+        if(req.body.password !== req.body.confirmPassword){
+            return next(new ErrorResponse("Passwords does not match", 400));
+        }
+    
+        seller.password = req.body.password;
+        seller.resetPasswordToken = undefined;
+        seller.resetPasswordExpire = undefined;
+    
+        await seller.save();
+    
+        return res.status(201).json({
+            success: true,
+            message: "Password chnged successfully"
+        })
+    }catch(err){
+        next(err);
+    }
+});
+
 module.exports = {
     registerSeller,
     loginSeller,
-    logoutSeller
+    logoutSeller,
+    forgetPassword,
+    resetPassword,
 }
