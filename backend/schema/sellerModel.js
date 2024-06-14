@@ -16,7 +16,8 @@ const sellerSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please enter the seller password.']
+        required: [true, 'Please enter the seller password.'],
+        select: false,
     },
     phone : {
         type: String,

@@ -15,14 +15,12 @@ connectDB();
 
 app.use(express.json());
 app.use(cookie_parser());
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-}));
 
 app.use('/api/v1/products', require('./routes/productRoutes'));
 app.use('/api/v1/Auth/seller', require('./routes/Auth/seller'));
 app.use('/api/v1/Auth/user', require("./routes/Auth/user"));
+
+app.use('/api/v1/user', require("./routes/gen/userGenRoutes"));
 
 app.use(errorHandler);
 
