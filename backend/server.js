@@ -5,6 +5,7 @@ const cookie_parser = require("cookie-parser");
 const connectDB = require("./config/mongoDB");
 const mongoose = require("mongoose");
 const errorHandler = require("./middlewares/errorHandler");
+const cors = require("cors");
 
 // An express app is created.
 const app = express();
@@ -14,6 +15,10 @@ connectDB();
 
 app.use(express.json());
 app.use(cookie_parser());
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 
 app.use('/api/v1/products', require('./routes/productRoutes'));
 app.use('/api/v1/Auth/seller', require('./routes/Auth/seller'));

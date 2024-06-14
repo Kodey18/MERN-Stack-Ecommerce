@@ -57,7 +57,7 @@ userSchema.pre('save', async function (next){
     next();
 });
 
-userSchema.methods.getResetPasswordToken = () => {
+userSchema.methods.getResetPasswordToken = function () {
     // here randomBytes will generate a buffer value with 20 bytes, then using the toString("hex") that buffer value will be convverted to hex value.
     const resetToken = crypto.randomBytes(20).toString("hex");
 
@@ -67,9 +67,9 @@ userSchema.methods.getResetPasswordToken = () => {
         .update(resetToken)
         .digest("hex");
 
-        this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
-        return resetToken;
+    return resetToken;
 }
 
 const User = mongoose.model("User", userSchema);
