@@ -51,7 +51,7 @@ const loginSeller = async_handler( async(req, res, next) => {
     }
 
     try{
-        const seller = await Seller.findOne({email}).exec();
+        const seller = await Seller.findOne({email}).select("+password").exec();
         const authenticated = await bcrypt.compareSync(password, seller.password);
 
         if(!seller || !(authenticated)){
@@ -86,6 +86,11 @@ const logoutSeller = async_handler( async(req, res, next) => {
     }
 });
 
+/* 
+Desc: generate Forget password link and token
+route : /api/v1/auth/seller/password/forgot
+method : post
+*/
 const forgotPassword = async_handler( async(req, res, next) => {
     const {email} = req.body;
 

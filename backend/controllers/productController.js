@@ -63,7 +63,7 @@ const createProduct = async_handler( async(req, res, next) => {
             price,
             images,
             category,
-            seller: req.user.objId,
+            seller: req.user._id,
         });
 
         if(product){
@@ -139,7 +139,6 @@ Desc : Delete a product
 method : DELETE
 route : '/api/v1/products/DELETE/:productId'
 */
-
 const deleteProduct = async_handler( async(req, res, next) => {
     const productId = req.params.productID;
 
@@ -179,7 +178,65 @@ const deleteProduct = async_handler( async(req, res, next) => {
         // });
         return next(err);
     }
-})
+});
+
+/* 
+Desc: Create or update product reveiw
+route: /api/v1/products/rveiw
+method: post
+*/
+const productReview = async_handler( async(req, res, next) => {
+    try{
+        const {rating, comment, productId} = req.body;
+
+        const reveiw = {
+            user: req.user._id,
+            name : req.user.name,
+            ratings: Number(rating),
+            comment: comment,
+        }
+
+        const product = await Product.findById(productId);
+
+        if(!product){
+            return next(new ErrorResponse("Product not found.", 401));
+        }
+
+        if(product.seller.toString() === req.user._id.toString()){
+            return next(new ErrorResponse('You cannot review your own product', 401));
+        }
+
+        const isReveiwed = product.reveiws.find(reveiw => reveiw.user.toString() === req.user._id.toString());
+
+        if(isReveiwed){
+            product.reveiws.forEach((reveiw) => {
+                if(reveiw.user.toString() === req.user._id.toString()){
+                    reveiw.ratings = rating;
+                    reveiw.comment = comment;
+                }
+            })
+        }else{
+            product.reveiws.push(reveiw);
+            product.noOfReveiws = product.reveiws.length;
+        }
+        let ttlRatings = 0;
+
+        product.reveiws.forEach((rev) => {
+            ttlRatings = ttlRatings + rev.ratings;
+        });
+
+        product.noOfRatings = ttlRatings / product.reveiws.length;
+
+        await product.save({validateBeforeSave: false});
+
+        return res.status(200).json({
+            success: true,
+            product,
+        });
+    }catch(err){
+        next(err);
+    }
+});
 
 module.exports = {
     getAllProducts,
@@ -187,4 +244,5 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getSingleProduct,
+    productReview,
 }
