@@ -31,7 +31,6 @@ mongoose.connection.once('open', () => {
     });
 });
 
-mongoose.connection.on('error', (err) => {
-    // console.log(`error : ${err}`);
+mongoose.connection.on('error', (err, next) => {
     next(err);
 });

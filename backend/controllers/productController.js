@@ -238,6 +238,22 @@ const productReview = async_handler( async(req, res, next) => {
     }
 });
 
+/*
+Desc : get all reveiws of the product
+route : /api/v1/products/reveiws
+mehtod : GET
+*/
+const getReveiws = async_handler( async(req, res, next) => {
+    const productId = req.params.productId;
+    try{
+        const {reveiws} = await Product.findById(productId).populate('reveiws');
+        console.log(reveiwshhhj);
+
+    }catch(err){
+        next(err);
+    }
+});
+
 module.exports = {
     getAllProducts,
     createProduct,
@@ -245,4 +261,5 @@ module.exports = {
     deleteProduct,
     getSingleProduct,
     productReview,
+    getReveiws,
 }
