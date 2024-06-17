@@ -37,7 +37,7 @@ const addToWishlist = async_handler( async( req, res, next) => {
         return res.status(201).json({
             success: true,
             message: "Product added to wishlist successfully.",
-            userWishlist;
+            userWishlist
         })
     }catch(err){
         next(err);
@@ -71,7 +71,7 @@ const removeFromWishlist = async_handler( async(req, res, next) => {
             return res.status(201).json({
                 success: true,
                 message: "Product removed from wishlist successfully.",
-                userWishlist;
+                userWishlist
             });
         }
     }catch(err){
