@@ -246,13 +246,66 @@ mehtod : GET
 const getReveiws = async_handler( async(req, res, next) => {
     const productId = req.params.productId;
     try{
-        const {reveiws} = await Product.findById(productId).populate('reveiws');
-        console.log(reveiwshhhj);
+        const product = await Product.findById(productId).populate('reveiws');
+
+        if(!product){
+            return next(new ErrorResponse("Product not found", 404));
+        }
+
+        let reveiws = product.reveiws;
+        const userReveiwIndex = reveiws.findIndex(reveiw => reveiw.user.toString() === req.user._id.toString())
+
+        // here if no such reveiw is found then it will userReveiwIndex will have -1.
+        if(userReveiwIndex !== -1){
+            // Move the user's review to the beginning
+            const userReveiw = reveiws.splice(userReveiwIndex, 1)[0];
+            reveiws = [userReveiw, ...reveiws];
+        }
+
+        return res.status(201).json({
+            success: true,
+            reveiws,
+        });
 
     }catch(err){
         next(err);
     }
 });
+
+/*
+Desc : Delete a product reveiw
+route : /api/v1/products/reveiw/:productId
+method delete
+*/
+const deleteReview = async_handler(async (req, res, next) => {
+    const productId = req.params.productId;
+    const userId = req.user._id;  // Assuming req.user contains the logged-in user's info
+
+    try {
+        const product = await Product.findById(productId).populate('reviews');
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const userReveiwIndex = product.reveiws.findIndex(reveiw => reveiw.user.toString() === userId.toString());
+
+        if(userReveiwIndex === -1){
+            return next(new ErrorResponse("Reveiw not found.", 404));
+        }
+
+        product.reveiws.splice(userReveiwIndex, 1);
+
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Reveiw deleted successfully",
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
 
 module.exports = {
     getAllProducts,
@@ -262,4 +315,5 @@ module.exports = {
     getSingleProduct,
     productReview,
     getReveiws,
+    deleteReview,
 }

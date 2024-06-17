@@ -10,5 +10,6 @@ Router.put('/update/:productID', verifyToken, roleCheck("seller"), productContro
 Router.delete('/delete/:productID', verifyToken, roleCheck('seller'), productController.deleteProduct);
 Router.post('/reveiw', verifyToken, productController.productReview);
 Router.get('/reveiw/:productId', productController.getReveiws);
+Router.delete('/reveiw/:productId', verifyToken, productController.deleteReview);
 
 module.exports = Router;
