@@ -12,7 +12,13 @@ const wishlistSchema = new mongoose.Schema({
             required: true,
             enum: ['User', 'Seller'],
         }
-    }
+    },
+    products: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+        }
+    ]
 },{
     timestamps: true,
 });
