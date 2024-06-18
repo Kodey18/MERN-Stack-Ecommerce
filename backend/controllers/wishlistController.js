@@ -1,6 +1,7 @@
 const async_handler = require("express-async-handler");
 const WishList = require("../schema/wishlistSchema");
 const Product = require("../schema/productSchema");
+const errorResponse = require("../utils/errorResponse");
 
 /*
 Desc: add product to wishlist.
@@ -79,7 +80,71 @@ const removeFromWishlist = async_handler( async(req, res, next) => {
     }
 });
 
+/*
+Desc: get user wishlsit
+route: /api/v1/wishlist/
+method : GET
+*/
+const getUserWishlist = async_handler(async( req, res, next) => {
+    const ownerId = req.user._id;
+    const ownerType = req.user.role;
+
+    try{
+        let userWishlist = await WishList.findOne({
+            'owner.id' : ownerId,
+            'owner.type' : ownerType,
+        });
+
+        if(!userWishlist){
+            return next(new errorResponse("Wishlist not found", 404));
+        }
+
+        return res.status(201).json({
+            success: true,
+            userWishlist,
+        });
+    }catch(err){}
+});
+
+/**
+Desc: get user wishlist products.
+route: /api/v1/wishlist/products
+method: GET
+*/
+const getUserWishlistProducts = async_handler( async(req, res, next) => {
+    const ownerId = req.user._id;
+    const ownerType = req.user.role;
+
+    try{
+        const userWishlist = await WishList.findOne({
+            'owner.id' : ownerId,
+            'owner.type' : ownerType,
+        });
+
+        if(userWishlist && userWishlist.products.length > 0){
+            const productDetails = await Product.find({
+                '_id': { $in: userWishlist.products }
+            });
+
+            if(!productDetails || !productDetails.length > 0){
+                return next(new errorResponse("Error fetching products of wishlist", 404));
+            }
+
+            return res.status(201).json({
+                success: true,
+                productDetails,
+            });
+        }else {
+            return next(new errorResponse("user wishlist not found", 404));
+        }
+    }catch(err){
+        next(err);
+    }
+});
+
 module.exports = {
-    userWishlist,
+    getUserWishlistProducts,
+    getUserWishlist,
+    addToWishlist,
     removeFromWishlist,
 };
