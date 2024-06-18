@@ -1,8 +1,9 @@
 const Router = require("express").Router();
 const wishlistController = require("../controllers/wishlistController");
+const verifyToken = require("../middlewares/verifyToken");
 
-Router.get('/', wishlistController.getUserWishlistProducts);
-Router.post('/', wishlistController.addToWishlist);
-Router.delete('/', wishlistController.removeFromWishlist);
+Router.get('/', verifyToken, wishlistController.getUserWishlistProducts);
+Router.post('/', verifyToken, wishlistController.addToWishlist);
+Router.delete('/', verifyToken, wishlistController.removeFromWishlist);
 
 module.exports = Router;

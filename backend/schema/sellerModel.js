@@ -41,7 +41,7 @@ const sellerSchema = new mongoose.Schema({
     },
     role : {
         type: String,
-        default: "seller",
+        default: "Seller",
         required: false,
     },
     resetPasswordToken : String,

@@ -1,6 +1,6 @@
 const async_handler = require("express-async-handler");
 const WishList = require("../schema/wishlistSchema");
-const Product = require("../schema/productSchema");
+const Product = require("../schema/productModel");
 const errorResponse = require("../utils/errorResponse");
 
 /*
@@ -12,6 +12,7 @@ const addToWishlist = async_handler( async( req, res, next) => {
     const ownerId = req.user._id;
     const ownerType = req.user.role;
     const {productId} = req.body;
+    console.log(`ownerId : ${ownerId}, ownerType : ${ownerType}`);
 
     try{
         let userWishlist = await WishList.findOne({
