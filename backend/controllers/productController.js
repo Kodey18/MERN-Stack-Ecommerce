@@ -46,7 +46,9 @@ const getSingleProduct = async_handler( async(req, res, next) => {
             success: true,
             product,
         });
-    }catch(err){}
+    }catch(err){
+        next(err);
+    }
 });
 
 /* 
@@ -126,11 +128,7 @@ const updateProduct = async_handler( async(req, res) => {
 
     }catch(err){
         console.error('Error updating product:', err);
-        // return res.status(500).json({
-        //     success: false,
-        //     message: 'Internal Server Error'
-        // });
-        return next(err);
+        next(err);
     }
 });
 
@@ -150,7 +148,7 @@ const deleteProduct = async_handler( async(req, res, next) => {
             //     success: false,
             //     message: 'Product not found'
             // });
-            return next(new ErrorResponse('Product not found',404));
+            return next(new ErrorResponse('Product not found',401));
         }
 
         // Check if the authenticated user is the seller of the product
@@ -171,12 +169,8 @@ const deleteProduct = async_handler( async(req, res, next) => {
             message: 'Product deleted successfully'
         });
     }catch(err){
-        console.error('Error deleting product:', err);
-        // return res.status(500).json({
-        //     success: false,
-        //     message: 'Internal Server Error'
-        // });
-        return next(err);
+        console.error('Error deleting product:', err);  
+        next(err);
     }
 });
 
