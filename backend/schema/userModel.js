@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const crypto = require("crypto");
+const { type } = require('os');
 
 
 const userSchema = new mongoose.Schema({
@@ -44,6 +45,9 @@ const userSchema = new mongoose.Schema({
     ],
     resetPasswordToken : String,
     resetPasswordExpire : Date,
+    lastUpdated : {
+        type: Date
+    }
 },{
     timestamps: true
 });
@@ -56,6 +60,11 @@ userSchema.pre('save', async function (next){
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
+
+userSchema.pre('findOneAndUpdate', function (next) {
+    this.set({ lastUpdated: Date.now() });
+    next();
+})
 
 userSchema.methods.getResetPasswordToken = function () {
     // here randomBytes will generate a buffer value with 20 bytes, then using the toString("hex") that buffer value will be convverted to hex value.

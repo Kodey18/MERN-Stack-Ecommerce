@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const crypto = require("crypto");
+const { type } = require("os");
 
 const sellerSchema = new mongoose.Schema({
     name: {
@@ -46,6 +47,9 @@ const sellerSchema = new mongoose.Schema({
     },
     resetPasswordToken : String,
     resetPasswordExpire : Date,
+    lastUpdated : {
+        type: Date
+    }
 }, {
     timestamps: true
 });
@@ -56,6 +60,12 @@ sellerSchema.pre('save', async function (next) {
     }
 
     this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+// Update the lastUpdated field before updating
+sellerSchema.pre('findOneAndUpdate', function (next) {
+    this.set({ lastUpdated: Date.now() });
     next();
 });
 

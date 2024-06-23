@@ -8,8 +8,7 @@ const Seller = require("../../schema/sellerModel");
  * Method : DELETE
 */
 const deleteSeller = async_handler( async(req, res, next) => {
-    const sellerId = req.body.sellerId;
-
+    const { sellerId } = req.body;
     try{
         if(sellerId !== req.user._id){
             return next(new ErrorResponse('Unauthorised Seller', 401));
@@ -28,6 +27,36 @@ const deleteSeller = async_handler( async(req, res, next) => {
     }
 });
 
+/**
+ * Desc : Update seller profile
+ * route : /api/v1/seller/
+ * method : put
+ */
+const updaetSeller = async_handler( async(req, res, next) => {
+    const {sellerId, ...updateDetails} = req.body;
+
+    try{
+        if(sellerId !== req.user._id){
+            return next(new ErrorResponse('Unauthorised Seller', 401));
+        }
+
+        const updatedSeller = await Seller.findOneAndUpdate(sellerId, updateDetails, {
+            new: true,
+            runValidators: true,
+        });
+
+        if(updatedSeller){
+            return res.status(201).json({
+                success: true,
+                message: 'Seller profile updated successfully',
+            });
+        }
+    }catch(err){
+        next(err);
+    }
+});
+
 module.exports = {
+    updaetSeller,
     deleteSeller,
 };

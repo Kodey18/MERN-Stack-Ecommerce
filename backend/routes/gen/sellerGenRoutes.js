@@ -4,6 +4,7 @@ const sellerController = require('../../controllers/generalControllers/sellerCon
 
 const Router = require("express").Router();
 
-Router.Delete('/', verifyToken, role('Seller'), );
+Router.put('/', verifyToken, role('Seller'), );
+Router.delete('/', verifyToken, role('Seller'), sellerController.deleteSeller);
 
 module.exports = Router;
