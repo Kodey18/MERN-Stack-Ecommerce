@@ -20,7 +20,7 @@ const verifyToken = (req, res, next) => {
                 err,
             });
         }
-        const Schema = user.role === "seller" ? Seller : User;
+        const Schema = user.role === "Seller" ? Seller : User;
 
         const checkProfile = await Schema.findById(user.objId);
         if(!checkProfile){

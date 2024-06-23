@@ -11,7 +11,7 @@ const generateToken = (res, objId, role) => {
     res.cookie('jwt', token, {
         httpOnly : true,
         // if you want to use https only cookies set this value as true
-        secure: true,
+        secure: false,
         sameSite:'strict',
         maxAge : 1000*60*60*24,
     });

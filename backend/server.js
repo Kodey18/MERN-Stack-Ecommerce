@@ -5,7 +5,6 @@ const cookie_parser = require("cookie-parser");
 const connectDB = require("./config/mongoDB");
 const mongoose = require("mongoose");
 const errorHandler = require("./middlewares/errorHandler");
-const cors = require("cors");
 
 // An express app is created.
 const app = express();
@@ -20,7 +19,8 @@ app.use('/api/v1/Auth/seller', require('./routes/Auth/seller'));
 app.use('/api/v1/Auth/user', require("./routes/Auth/user"));
 app.use('/api/v1/products', require('./routes/productRoutes'));
 app.use('/api/v1/user', require("./routes/gen/userGenRoutes"));
-app.use('/api/v1/wishlist', require('./routes/wishlistRoutes'));
+app.use('/api/v1/seller', require('./routes/gen/sellerGenRoutes'));
+app.use('/api/v1/wishlist', require('./routes/wishlistRoutes'));  
 
 app.use(errorHandler);
 
